@@ -16,6 +16,7 @@ export const VerifySchema = new mongoose.Schema({
     token: {
         type: String,
         required: true
-    }
+    },
+    passwordResetExpires: Date,
 
 }, { timestamps: true })

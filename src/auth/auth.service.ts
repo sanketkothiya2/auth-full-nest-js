@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Delete } from '@nestjs/common';
 import { User } from './interfaces/user.interface';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -127,6 +127,16 @@ export class AuthService {
             }, time);
         } catch (error) {
             throw new InternalServerErrorException('Error while expiring token')
+        }
+    }
+
+    async expiredForgotToken(id: string, time: number) {
+        try {
+            setTimeout(async () => {
+                await this.tokensModel.findByIdAndRemove(id);
+            }, time);
+        } catch (error) {
+            throw new InternalServerErrorException('Error while expiring forgot token')
         }
     }
 
@@ -330,7 +340,8 @@ export class AuthService {
                 userId: user._id,
                 email: user.email,
                 token,
-                type: 'forgetPassword'
+                type: 'forgetPassword',
+                passwordResetExpires: Date.now() + 10 * 60 * 1000
             }
             const newTokenObj = new this.tokensModel(verifyObj);
             const newToken = await newTokenObj.save();
@@ -343,6 +354,7 @@ export class AuthService {
 
             //If mail successfully send then save User into the database
             if (isMailSend.accepted.length > 0) {
+                // this.expiredForgotToken(newToken._id, 1000 * 60 * 10)
                 return {
                     message: `Reset Password link has been sent to ${user.email} email address.`
                 }
@@ -354,7 +366,6 @@ export class AuthService {
                     message: `We are unable to send verification email to you. Please try again later.`
                 }
             }
-
         }
         else {
             return {
@@ -399,20 +410,28 @@ export class AuthService {
     //     }
     // }
 
-    async resetPassword(token,resetPasswordDto) {
-        const { userID, tokenID, password, confirmPassword } = resetPasswordDto;
+    async resetPassword(token, resetPasswordDto) {
+        // const { userID, tokenID, password, confirmPassword } = resetPasswordDto;
+        const match = await this.tokensModel.findOne({ token: token, passwordResetExpires: { $gt: Date.now() } })
+        const user = await this.tokensModel.findOne({ token: token })
+
+        if (!match) {
+            return { message: "token has expired or invalid" }
+        }
+        const { password, confirmPassword } = resetPasswordDto;
+
 
         if (password === confirmPassword) {
 
             const hashPassword = await bcrypt.hash(password, 10);
-            const result = await this.user.findByIdAndUpdate({ _id: userID }, { password: hashPassword })
+            const result = await this.user.findByIdAndUpdate({ _id: user.userId }, { password: hashPassword })
             if (result) {
 
-                await this.tokensModel.findByIdAndRemove({ _id: tokenID });
+                await this.tokensModel.findByIdAndDelete({ _id: user._id });
                 return {
                     password,
                     confirmPassword,
-                    message: 'Password reset successfully.'
+                    message: '🛂Password reset successfully.'
                 }
 
             } else {

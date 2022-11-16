@@ -49,7 +49,6 @@ export class AuthController {
         return req.user
     }
 
-
     @Patch('/resetpassword/:token')
     async resetpassword(@Param('token') token, @Body() resetPasswordDto: ResetPasswordDto) {
         return this.auth.resetPassword(token, resetPasswordDto);
