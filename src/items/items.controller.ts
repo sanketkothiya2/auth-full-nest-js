@@ -14,7 +14,6 @@ export class ItemsController {
     //     console.log(req.url);
     //     return  res.send('All Items:');
     // }
-
     @Get()
     async findAll(): Promise<Item[]> {
         return this.itemsService.findAll();

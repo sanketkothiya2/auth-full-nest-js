@@ -475,27 +475,30 @@ export class AuthService {
     //     }
     // }
 
-    // async isAdmin(email, password) {
-    //     const admin = await this.user.findOne({ email })
-    //     if (admin) {
+    async isAdmin(email, password) {
+        const admin = await this.user.findOne({ email })
 
-    //         const isAdminPassMatched = await bcrypt.compare(password, admin.password)
-    //         if (isAdminPassMatched) {
+        console.log("🚀 ~ file: auth.service.ts ~ line 480 ~ AuthService ~ isAdmin ~ admin", admin)
 
-    //             return true
+        if (admin['role'] == 'admin') {
 
-    //         } else {
-    //             return {
-    //                 message: `Incorrect email and password of Admin.`
-    //             }
-    //         }
+            const isAdminPassMatched = await bcrypt.compare(password, admin.password)
+            if (isAdminPassMatched) {
 
-    //     } else {
-    //         return {
-    //             message: `Your are not an admin`
-    //         }
-    //     }
-    // }
+                return true
+
+            } else {
+                return {
+                    message: `Incorrect email and password of Admin.`
+                }
+            }
+
+        } else {
+            return {
+                message: `Your are not an admin`
+            }
+        }
+    }
 
     // async addNewUserByAdmin(createUserByAdminDto) {
     //     const { name, email, password } = createUserByAdminDto
@@ -508,14 +511,32 @@ export class AuthService {
     //     return await this.signUp()(newUserObj);
     // }
 
-    // async showAllUser(email, password) {
-    //     const users = await this.user.find({ role: 'user' });
-    //     if (users.length > 0) {
-    //         return users;
-    //     } else {
-    //         return {
-    //             message: `No users found.`
-    //         }
-    //     }
-    // }
+    async showAllUser(email, password) {
+        const users = await this.user.find({ role: 'user' });
+        if (users.length > 0) {
+            return users;
+        } else {
+            return {
+                message: `No users found.`
+            }
+        }
+    }
+
+    async updatePassword(req, resetPasswordDto) {
+        const user = await this.user.findById(req.user.id).select('+password');
+
+        // 2) Check if POSTed current password is correct
+        //   const isPassMatched = await bcrypt.compare(password, user['password'])
+        if (!(await bcrypt.compare(resetPasswordDto.password, req.user.password))) {
+            throw new Error("Your current password is wrong ")
+        }
+        // 3) If so, update password
+        const hashPassword = await bcrypt.hash(resetPasswordDto.password, 10)
+        req.user.password = hashPassword
+        const result = await user.save();
+        if (result) {
+            return user;
+        }
+
+    }
 }

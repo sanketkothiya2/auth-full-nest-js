@@ -77,15 +77,23 @@ export class AuthController {
     //     }
     // }
 
-    // @Post('/admin')
-    // async showAllUser(@Body('email') email, @Body('password') password) {
-    //     const isAdmin = await this.auth.isAdmin(email, password);
-    //     if (isAdmin === true) {
-    //         return this.auth.showAllUser(email, password);
-    //     } else {
-    //         return isAdmin;
-    //     }
-    // }
+    @Post('/admin')
+    async showAllUser(@Body('email') email, @Body('password') password) {
+        const isAdmin = await this.auth.isAdmin(email, password);
+        if (isAdmin === true) {
+            return this.auth.showAllUser(email, password);
+        } else {
+            return isAdmin;
+        }
+    }
+
+    @Patch('/updatePassword')
+    @UseGuards(AuthGuard('jwt'))
+    async updatepassword(@Req() req:string, @Body() resetPasswordDto: ResetPasswordDto){
+        return this.auth.updatePassword(req, resetPasswordDto)
+
+
+    }
 
     // @Post('/admin/addNewUser')
     // async addNewUserByAdmin(@Body() createUserByAdminDto: CreateUserByAdminDto) {
