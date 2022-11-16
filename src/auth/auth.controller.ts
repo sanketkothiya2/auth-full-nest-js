@@ -85,11 +85,12 @@ export class AuthController {
     @Post('/admin')
     async showAllUser(@Body('email') email, @Body('password') password) {
         const isAdmin = await this.auth.isAdmin(email, password);
-        if (isAdmin === true) {
-            return this.auth.showAllUser(email, password);
-        } else {
-            return isAdmin;
-        }
+        if (isAdmin) { console.log("hello done process"); }
+        // if (isAdmin === true) {
+        //     return this.auth.showAllUser(email, password);
+        // } else {
+        //     return isAdmin;
+        // }
     }
 
     // @Post('/admin/addNewUser')

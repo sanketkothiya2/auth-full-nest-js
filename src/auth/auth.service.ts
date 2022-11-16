@@ -209,17 +209,20 @@ export class AuthService {
 
     async login(input: LoginDto) {
         try {
-
             const { email, password } = input;
             const user = await this.user.findOne({ email });
-            if (user !== null) {
+            console.log(user);
+            if (user) {
 
                 if (user['verified'] === true) {
 
                     const isPassMatched = await bcrypt.compare(password, user['password'])
+                    console.log("🚀 ~ file: auth.service.ts ~ line 220 ~ AuthService ~ login ~ isPassMatched", isPassMatched)
+
                     if (isPassMatched) {
 
                         const newToken = await this.createNewToken(user, "authToken");
+                        console.log("🚀 ~ file: auth.service.ts ~ line 225 ~ AuthService ~ login ~ newToken", newToken)
                         if (newToken) {
                             let tok = newToken.token;
                             this.expireToken(newToken._id, 1000 * 60 * 60 * 24 * 2)
@@ -497,25 +500,29 @@ export class AuthService {
     // }
 
     async isAdmin(email, password) {
+        console.log("🚀 ~ file: auth.service.ts ~ line 500 ~ AuthService ~ isAdmin ~ password", password)
         const admin = await this.user.findOne({ email })
-        if (admin) {
+        console.log("🚀 ~ file: auth.service.ts ~ line 502 ~ AuthService ~ isAdmin ~ admin", admin)
+        return true
 
-            const isAdminPassMatched = await bcrypt.compare(password, admin.password)
-            if (isAdminPassMatched) {
+        // if (admin) {
 
-                return true
+        //     const isAdminPassMatched = await bcrypt.compare(password, admin.password)
+        //     if (isAdminPassMatched) {
 
-            } else {
-                return {
-                    message: `Incorrect email and password of Admin.`
-                }
-            }
+        //         return true
 
-        } else {
-            return {
-                message: `Your are not an admin`
-            }
-        }
+        //     } else {
+        //         return {
+        //             message: `Incorrect email and password of Admin.`
+        //         }
+        //     }
+
+        // } else {
+        //     return {
+        //         message: `Your are not an admin`
+        //     }
+        // }
     }
 
     // async addNewUserByAdmin(createUserByAdminDto) {
@@ -529,14 +536,14 @@ export class AuthService {
     //     return await this.signUp()(newUserObj);
     // }
 
-    // async showAllUser(email, password) {
-    //     const users = await this.user.find({ role: 'user' });
-    //     if (users.length > 0) {
-    //         return users;
-    //     } else {
-    //         return {
-    //             message: `No users found.`
-    //         }
-    //     }
-    // }
+    async showAllUser(email, password) {
+        const users = await this.user.find({ role: 'user' });
+        if (users.length > 0) {
+            return users;
+        } else {
+            return {
+                message: `No users found.`
+            }
+        }
+    }
 }
