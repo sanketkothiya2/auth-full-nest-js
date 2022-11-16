@@ -304,15 +304,36 @@ export class AuthService {
         }
     }
 
+    async deleteuser(req) {
+        const user = await this.user.findById({ _id: req.user._id })
+        try {
+            if (user) {
+                const result = await this.user.findByIdAndRemove({ _id: req.user._id });
+                if (result) {
+                    return { message: `user ${req.user.name} successfully deleted ` }
+                }
+            } else {
+                throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (error) {
+            if (error instanceof HttpException) {
+                throw error
+            } else {
+                throw new InternalServerErrorException('Error while deleting user new user account')
+            }
+
+        }
+    }
+
     async deleteAccount(userId: string) {
         try {
-
             if (userId) {
                 const user = await this.user.findById(userId)
                 if (user) {
                     const result = await this.user.findByIdAndRemove({ _id: user._id });
                     if (result) {
-                        return true;
+                        return { message: "user successfully deleted" }
                     }
                 } else {
                     throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
@@ -475,27 +496,27 @@ export class AuthService {
     //     }
     // }
 
-    // async isAdmin(email, password) {
-    //     const admin = await this.user.findOne({ email })
-    //     if (admin) {
+    async isAdmin(email, password) {
+        const admin = await this.user.findOne({ email })
+        if (admin) {
 
-    //         const isAdminPassMatched = await bcrypt.compare(password, admin.password)
-    //         if (isAdminPassMatched) {
+            const isAdminPassMatched = await bcrypt.compare(password, admin.password)
+            if (isAdminPassMatched) {
 
-    //             return true
+                return true
 
-    //         } else {
-    //             return {
-    //                 message: `Incorrect email and password of Admin.`
-    //             }
-    //         }
+            } else {
+                return {
+                    message: `Incorrect email and password of Admin.`
+                }
+            }
 
-    //     } else {
-    //         return {
-    //             message: `Your are not an admin`
-    //         }
-    //     }
-    // }
+        } else {
+            return {
+                message: `Your are not an admin`
+            }
+        }
+    }
 
     // async addNewUserByAdmin(createUserByAdminDto) {
     //     const { name, email, password } = createUserByAdminDto

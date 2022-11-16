@@ -66,8 +66,13 @@ export class AuthController {
     //     return this.auth.resetPassPost(resetPasswordDto);
     // }
 
-    // @Post('/deleteAccount')
-    // async deleteAccount(@Body('email') email) {
+    @UseGuards(AuthGuard('jwt'))
+    @Delete('/deleteAccount')
+    async deleteAccount(@Req() req: any) {
+        return this.auth.deleteuser(req)
+    }
+
+    //   async deleteAccount(@Body('email') email:string) {
     //     if (email.length > 0) {
     //         return this.auth.deleteAccount(email);
     //     } else {
@@ -77,15 +82,15 @@ export class AuthController {
     //     }
     // }
 
-    // @Post('/admin')
-    // async showAllUser(@Body('email') email, @Body('password') password) {
-    //     const isAdmin = await this.auth.isAdmin(email, password);
-    //     if (isAdmin === true) {
-    //         return this.auth.showAllUser(email, password);
-    //     } else {
-    //         return isAdmin;
-    //     }
-    // }
+    @Post('/admin')
+    async showAllUser(@Body('email') email, @Body('password') password) {
+        const isAdmin = await this.auth.isAdmin(email, password);
+        if (isAdmin === true) {
+            return this.auth.showAllUser(email, password);
+        } else {
+            return isAdmin;
+        }
+    }
 
     // @Post('/admin/addNewUser')
     // async addNewUserByAdmin(@Body() createUserByAdminDto: CreateUserByAdminDto) {
