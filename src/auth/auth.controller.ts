@@ -1,3 +1,4 @@
+import { CreateUserByAdminDto } from './dto/createUserByAdmin.dto';
 import { UpdatePasswod } from './dto/updatePass';
 import { ResetPasswordDto } from './dto/resetPass.dto';
 import { ForgetPasswordDto } from './dto/forgetPass.dto';
@@ -67,16 +68,17 @@ export class AuthController {
     //     return this.auth.resetPassPost(resetPasswordDto);
     // }
 
-    // @Post('/deleteAccount')
-    // async deleteAccount(@Body('email') email) {
-    //     if (email.length > 0) {
-    //         return this.auth.deleteAccount(email);
-    //     } else {
-    //         return {
-    //             message: `Please enter your email address.`
-    //         }
-    //     }
-    // }
+    @Delete('/deleteAccount/:id')
+    @UseGuards(AuthGuard('jwt'))
+    async deleteAccount(@Param('id') id: string) {
+        if (id.length > 0) {
+            return this.auth.deleteAccount(id);
+        } else {
+            return {
+                message: `Please enter your userid .`
+            }
+        }
+    }
 
     @Post('/admin')
     async showAllUser(@Body('email') email, @Body('password') password) {
@@ -96,15 +98,15 @@ export class AuthController {
 
     }
 
-    // @Post('/admin/addNewUser')
-    // async addNewUserByAdmin(@Body() createUserByAdminDto: CreateUserByAdminDto) {
-    //     const isAdmin = await this.auth.isAdmin(createUserByAdminDto.adminEmail, createUserByAdminDto.adminPassword);
-    //     if (isAdmin === true) {
-    //         return this.auth.addNewUserByAdmin(createUserByAdminDto);
-    //     } else {
-    //         return isAdmin;
-    //     }
-    // }
+    @Post('/admin/addNewUser')
+    async addNewUserByAdmin(@Body() createUserByAdminDto: CreateUserByAdminDto) {
+        const isAdmin = await this.auth.isAdmin(createUserByAdminDto.adminEmail, createUserByAdminDto.adminPassword);
+        if (isAdmin === true) {
+            return this.auth.addNewUserByAdmin(createUserByAdminDto);
+        } else {
+            return isAdmin;
+        }
+    }
 
 
     // @Post('/admin/updateUser/:userId')

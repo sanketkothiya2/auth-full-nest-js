@@ -330,7 +330,7 @@ export class AuthService {
                 if (user) {
                     const result = await this.user.findByIdAndRemove({ _id: user._id });
                     if (result) {
-                        return true;
+                        return { message: "user has been deleted successfully" }
                     }
                 } else {
                     throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
@@ -376,7 +376,7 @@ export class AuthService {
 
             //If mail successfully send then save User into the database
             if (isMailSend.accepted.length > 0) {
-                // this.expiredForgotToken(newToken._id, 1000 * 60 * 10)
+                this.expiredForgotToken(newToken._id, 1000 * 60 * 10)
                 return {
                     message: `Reset Password link has been sent to ${user.email} email address.`,
                 };
@@ -498,6 +498,10 @@ export class AuthService {
 
     async isAdmin(email, password) {
         const admin = await this.user.findOne({ email });
+        if (!admin) {
+            return { message: "admin not found with this email please right actual email" }
+
+        }
 
         // console.log(
         //     '🚀 ~ file: auth.service.ts ~ line 480 ~ AuthService ~ isAdmin ~ admin',
@@ -520,16 +524,16 @@ export class AuthService {
         }
     }
 
-    // async addNewUserByAdmin(createUserByAdminDto) {
-    //     const { name, email, password } = createUserByAdminDto
-    //     const newUserObj = {
-    //         name,
-    //         email,
-    //         password,
-    //     }
+    async addNewUserByAdmin(createUserByAdminDto) {
+        const { name, email, password } = createUserByAdminDto
+        const newUserObj = {
+            name,
+            email,
+            password,
+        }
 
-    //     return await this.signUp()(newUserObj);
-    // }
+        return await this.signUp(newUserObj);
+    }
 
     async showAllUser(email, password) {
         const users = await this.user.find({ role: 'user' });
