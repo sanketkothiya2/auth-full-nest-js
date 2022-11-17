@@ -257,6 +257,72 @@ export class AuthService {
         }
     }
 
+    // async updateUser(input: UpdateUser, id: string) {
+    //     try {
+    //         const user = await this.user.findOne({ _id: id });
+
+    //         if (user !== null) {
+    //             if (user['verified'] === true) {
+    //                 if (input.name || input.email) {
+    //                     if (input.email) {
+    //                         const newToken = await this.createNewToken(user, 'emailVerify');
+
+    //                         if (newToken) {
+    //                             const url = `http://localhost:3000/auth/verifyEmail/${user._id}/${newToken._id}/${newToken.token}`;
+    //                             const subject = `Verify Email`;
+    //                             const html = `This is Verification Email.<br> <a href='${url}'>Click here</a> or Go to this page ${url}`;
+
+    //                             const isMailSend = await this.sendMail(
+    //                                 subject,
+    //                                 html,
+    //                                 input.email,
+    //                                 newToken._id,
+    //                             );
+
+    //                             if (isMailSend) {
+    //                                 await this.user.findByIdAndUpdate(
+    //                                     { _id: id },
+    //                                     { email: input.email, verified: false },
+    //                                 );
+
+    //                                 var tok = newToken.token;
+    //                                 this.expireToken(newToken._id, 1000 * 60 * 15);
+    //                             } else {
+    //                                 throw new InternalServerErrorException(
+    //                                     'Error while creating new user',
+    //                                 );
+    //                             }
+    //                         }
+    //                     }
+
+    //                     if (input.name) {
+    //                         await this.user.findByIdAndUpdate(
+    //                             { _id: id },
+    //                             { name: input.name },
+    //                         );
+    //                     }
+
+    //                     const updatedUser = await this.user.findOne({ _id: id });
+    //                     return { updatedUser, token: tok };
+    //                 } else {
+    //                     throw new InternalServerErrorException(
+    //                         `User cannot change other credentials except name and email!`,
+    //                     );
+    //                 }
+    //             } else {
+    //                 throw new InternalServerErrorException('Unverified email!');
+    //             }
+    //         } else {
+    //             throw new InternalServerErrorException('User not found!');
+    //         }
+    //     } catch (error) {
+    //         if (error instanceof HttpException) {
+    //             throw error;
+    //         }
+    //         throw new InternalServerErrorException('Error while signing In!');
+    //     }
+    // }  
+    
     async updateUser(input: UpdateUser, id: string) {
         try {
             const user = await this.user.findOne({ _id: id });

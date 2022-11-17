@@ -1,3 +1,4 @@
+import { UpdateUserByAdminDto } from './dto/updateUserByAdmin.dto';
 import { CreateUserByAdminDto } from './dto/createUserByAdmin.dto';
 import { UpdatePasswod } from './dto/updatePass';
 import { ResetPasswordDto } from './dto/resetPass.dto';
@@ -107,15 +108,13 @@ export class AuthController {
             return isAdmin;
         }
     }
-
-
-    // @Post('/admin/updateUser/:userId')
-    // async updateUserByAdmin(@Param('userId') userId, @Body() updateUserByAdminDto: UpdateUserByAdminDto) {
-    //     const isAdmin = await this.auth.isAdmin(updateUserByAdminDto.adminEmail, updateUserByAdminDto.adminPassword);
-    //     if (isAdmin === true) {
-    //         return this.auth.updateUser(updateUserByAdminDto, userId);
-    //     } else {
-    //         return isAdmin;
-    //     }
-    // }
+    @Post('/admin/updateUser/:userId')
+    async updateUserByAdmin(@Param('userId') userId, @Body() updateUserByAdminDto: UpdateUserByAdminDto) {
+        const isAdmin = await this.auth.isAdmin(updateUserByAdminDto.adminEmail, updateUserByAdminDto.adminPassword);
+        if (isAdmin === true) {
+            return this.auth.updateUser(updateUserByAdminDto, userId);
+        } else {
+            return isAdmin;
+        }
+    }
 }
