@@ -1,3 +1,4 @@
+import { UpdatePasswod } from './dto/updatePass';
 import { ResetPasswordDto } from './dto/resetPass.dto';
 import { ForgetPasswordDto } from './dto/forgetPass.dto';
 import { Controller, Get, Post, Put, Delete, Body, Req, Res, Param, UseGuards, Patch } from '@nestjs/common';
@@ -89,8 +90,8 @@ export class AuthController {
 
     @Patch('/updatePassword')
     @UseGuards(AuthGuard('jwt'))
-    async updatepassword(@Req() req:string, @Body() resetPasswordDto: ResetPasswordDto){
-        return this.auth.updatePassword(req, resetPasswordDto)
+    async updatepassword(@Req() req: string, @Body() updatepassword: UpdatePasswod) {
+        return this.auth.updatePassword(req, updatepassword)
 
 
     }
